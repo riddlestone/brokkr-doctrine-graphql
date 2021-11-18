@@ -1,0 +1,13 @@
+<?php
+
+use Laminas\View\Renderer\PhpRenderer;
+
+/**
+ * @var PhpRenderer $this
+ * @var string $message
+ * @var Exception $exception
+ */
+?>
+<h1>Error</h1>
+<p><?= $this->escapeHtml($message) ?></p>
+<pre><?= $this->escapeHtml($exception->getMessage()) ?></pre>
