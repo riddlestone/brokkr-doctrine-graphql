@@ -13,13 +13,38 @@ class TestEntity
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue
-     * @var int|null
      */
-    public ?int $id;
+    protected ?int $id = null;
 
     /**
      * @ORM\Column(type="string")
-     * @var string
      */
-    public string $name;
+    protected ?string $name = null;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="TestParentEntity", inversedBy="children")
+     */
+    protected ?TestParentEntity $parent = null;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setParent(?TestParentEntity $parent): void
+    {
+        $this->parent && $this->parent->removeChild($this);
+        $this->parent = $parent;
+        $this->parent && $this->parent->addChild($this);
+    }
 }

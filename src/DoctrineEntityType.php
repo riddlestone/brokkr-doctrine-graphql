@@ -4,6 +4,7 @@ namespace Riddlestone\Brokkr\DoctrineGraphQL;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -11,21 +12,28 @@ use Riddlestone\Brokkr\GraphQL\Types\GraphQLTypeManager;
 
 class DoctrineEntityType extends ObjectType
 {
-    protected GraphQLTypeManager $typeManager;
-
-    public function __construct(string $entityClass, EntityManager $entityManager, GraphQLTypeManager $typeManager)
-    {
+    public function __construct(
+        string $entityClass,
+        EntityManager $entityManager,
+        GraphQLTypeManager $typeManager,
+        TypeMapper $typeMapper
+    ) {
         $metadata = $entityManager->getClassMetadata($entityClass);
 
         parent::__construct([
+            'name' => $entityClass,
             'fields' => array_merge(
-                $this->getFieldsFromMetaData($metadata, $typeManager),
-                $this->getRelationshipsFromMetaData($metadata)
+                $this->getFieldsFromMetaData($metadata, $typeManager, $typeMapper),
+                $this->getAssociationsFromMetaData($metadata, $typeManager)
             ),
         ]);
     }
 
-    protected function getFieldsFromMetaData(ClassMetadata $metadata, GraphQLTypeManager $typeManager): array
+    protected function getFieldsFromMetaData(
+        ClassMetadata $metadata,
+        GraphQLTypeManager $typeManager,
+        TypeMapper $typeMapper
+    ): array
     {
         $fields = [];
         foreach ($metadata->getFieldNames() as $fieldName) {
@@ -34,7 +42,7 @@ class DoctrineEntityType extends ObjectType
             } catch (MappingException $e) {
                 continue;
             }
-            $type = $this->mapType($mapping['type']);
+            $type = $typeMapper->getGraphQLType($mapping);
             if ($type) {
                 $fields[$fieldName] = [
                     'type' => fn() => $typeManager->get($type),
@@ -45,24 +53,24 @@ class DoctrineEntityType extends ObjectType
         return $fields;
     }
 
-    protected function getRelationshipsFromMetaData(ClassMetadata $metadata): array
+    protected function getAssociationsFromMetaData(
+        ClassMetadata $metadata,
+        GraphQLTypeManager $typeManager
+    ): array
     {
-        return [];
-    }
-
-    protected function mapType(string $doctrineType): ?string
-    {
-        return [
-                'string' => 'string',
-                'integer' => 'int',
-                'smallint' => 'int',
-                'bigint' => 'string',
-                'boolean' => 'boolean',
-                'decimal' => 'string',
-                'text' => 'string',
-                'float' => 'float',
-                'guid' => 'string',
-                'blob' => 'string',
-            ][$doctrineType] ?? null;
+        $fields = [];
+        foreach ($metadata->getAssociationMappings() as $associationMapping) {
+            $fields[$associationMapping['fieldName']] = [
+                'type' => function() use ($typeManager, $associationMapping) {
+                    $type = $typeManager->get($associationMapping['targetEntity']);
+                    if ($associationMapping['type'] & ClassMetadataInfo::TO_MANY) {
+                        $type = Type::listOf($type);
+                    }
+                    return $type;
+                },
+                'resolve' => fn($entity) => $metadata->getFieldValue($entity, $associationMapping['fieldName']),
+            ];
+        }
+        return $fields;
     }
 }

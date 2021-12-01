@@ -31,7 +31,8 @@ class DoctrineEntityTypeFactory implements AbstractFactoryInterface
         return new DoctrineEntityType(
             $requestedName,
             $container->get(EntityManager::class),
-            $container->get(GraphQLTypeManager::class)
+            $container->get(GraphQLTypeManager::class),
+            $container->get(TypeMapper::class)
         );
     }
 }
