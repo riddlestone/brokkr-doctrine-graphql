@@ -24,7 +24,15 @@ class RepositoryGraphQLField extends FieldDefinition implements NeedsTypeManager
                     'type' => fn () => Type::listOf(
                         $typeManager->get($this->getRepository()->getClassName())
                     ),
-                    'resolve' => fn ($rootValue, $args, $contextValue, ResolveInfo $info) => $this->resolve($info),
+                    'resolve' =>
+                        /**
+                         * @param mixed $rootValue
+                         * @param mixed $args
+                         * @param mixed $contextValue
+                         * @param ResolveInfo $info
+                         * @return array
+                         */
+                        fn ($rootValue, $args, $contextValue, ResolveInfo $info): array => $this->resolve($info),
                 ],
                 $config
             )

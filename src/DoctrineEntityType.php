@@ -45,8 +45,13 @@ class DoctrineEntityType extends ObjectType
             $type = $typeMapper->getGraphQLType($mapping);
             if ($type) {
                 $fields[$fieldName] = [
-                    'type' => fn() => $typeManager->get($type),
-                    'resolve' => fn($entity) => $metadata->getFieldValue($entity, $fieldName),
+                    'type' => fn(): string => $typeManager->get($type),
+                    'resolve' =>
+                        /**
+                         * @param mixed $entity
+                         * @return mixed
+                         */
+                        fn($entity) => $metadata->getFieldValue($entity, $fieldName),
                 ];
             }
         }
@@ -61,14 +66,19 @@ class DoctrineEntityType extends ObjectType
         $fields = [];
         foreach ($metadata->getAssociationMappings() as $associationMapping) {
             $fields[$associationMapping['fieldName']] = [
-                'type' => function() use ($typeManager, $associationMapping) {
+                'type' => function() use ($typeManager, $associationMapping): Type {
                     $type = $typeManager->get($associationMapping['targetEntity']);
                     if ($associationMapping['type'] & ClassMetadataInfo::TO_MANY) {
                         $type = Type::listOf($type);
                     }
                     return $type;
                 },
-                'resolve' => fn($entity) => $metadata->getFieldValue($entity, $associationMapping['fieldName']),
+                'resolve' =>
+                    /**
+                     * @param mixed $entity
+                     * @return mixed
+                     */
+                    fn($entity) => $metadata->getFieldValue($entity, $associationMapping['fieldName']),
             ];
         }
         return $fields;
