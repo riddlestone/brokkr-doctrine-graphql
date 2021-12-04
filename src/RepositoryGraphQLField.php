@@ -3,8 +3,11 @@
 namespace Riddlestone\Brokkr\DoctrineGraphQL;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Exception;
+use GraphQL\Language\AST\FieldNode;
 use GraphQL\Type\Definition\FieldDefinition;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Riddlestone\Brokkr\GraphQL\Fields\NeedsTypeManagerInterface;
 use Riddlestone\Brokkr\GraphQL\Types\GraphQLTypeManager;
@@ -21,7 +24,7 @@ class RepositoryGraphQLField extends FieldDefinition implements NeedsTypeManager
                     'type' => fn () => Type::listOf(
                         $typeManager->get($this->getRepository()->getClassName())
                     ),
-                    'resolve' => fn () => $this->resolve(),
+                    'resolve' => fn ($rootValue, $args, $contextValue, ResolveInfo $info) => $this->resolve($info),
                 ],
                 $config
             )
@@ -49,11 +52,39 @@ class RepositoryGraphQLField extends FieldDefinition implements NeedsTypeManager
     }
 
     /**
-     * @return array
      * @throws Exception
      */
-    protected function resolve(): array
+    protected function resolve(ResolveInfo $info): array
     {
-        return $this->getRepository()->findAll();
+        $queryBuilder = $this->getRepository()->createQueryBuilder($this->getTableAlias(0));
+        $this->joinRequiredTables($queryBuilder, $info->fieldNodes[0]);
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * Joins tables needed for eager loading of results based on the field selections in the GraphQL query
+     */
+    protected function joinRequiredTables(QueryBuilder $queryBuilder, FieldNode $node, ?int &$joinNumber = 0): void
+    {
+        $rootJoinNumber = $joinNumber;
+        foreach ($node->selectionSet->selections as $child) {
+            if (
+                !$child instanceof FieldNode
+                || !$child->selectionSet->selections
+                || $child->selectionSet->selections->count() == 0
+            ) {
+                continue;
+            }
+            $queryBuilder->leftJoin(
+                $this->getTableAlias($rootJoinNumber) . '.' . $child->name->value,
+                $this->getTableAlias(++$joinNumber)
+            );
+            $this->joinRequiredTables($queryBuilder, $child, $joinNumber);
+        }
+    }
+
+    protected function getTableAlias(int $joinNumber): string
+    {
+        return 't_' . $joinNumber;
     }
 }
