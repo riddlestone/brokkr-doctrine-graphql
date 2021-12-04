@@ -64,8 +64,11 @@ class RepositoryGraphQLField extends FieldDefinition implements NeedsTypeManager
     /**
      * Joins tables needed for eager loading of results based on the field selections in the GraphQL query
      */
-    protected function joinRequiredTables(QueryBuilder $queryBuilder, FieldNode $node, ?int &$joinNumber = 0): void
+    protected function joinRequiredTables(QueryBuilder $queryBuilder, FieldNode $node, int &$joinNumber = 0): void
     {
+        if (!$node->selectionSet) {
+            return;
+        }
         $rootJoinNumber = $joinNumber;
         foreach ($node->selectionSet->selections as $child) {
             if (

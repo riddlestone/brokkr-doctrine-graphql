@@ -7,7 +7,11 @@ namespace Riddlestone\Brokkr\DoctrineGraphQL;
  */
 class TypeMapper
 {
-    public function getGraphQLType($doctrineMapping): ?string
+    /**
+     * @param array{type: string} $doctrineMapping
+     * @return string|null
+     */
+    public function getGraphQLType(array $doctrineMapping): ?string
     {
         switch ($doctrineMapping['type']) {
             case 'string':

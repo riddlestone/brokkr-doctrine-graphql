@@ -6,6 +6,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\Mapping\MappingException;
 use Exception;
 use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -39,7 +42,10 @@ class RepositoryGraphQLFieldFactory implements AbstractFactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): RepositoryGraphQLField
     {
-        $field = new RepositoryGraphQLField($options, $container->get(GraphQLTypeManager::class));
+        if (!class_exists($requestedName)) {
+            throw new ServiceNotFoundException(sprintf('"%s" is not a known entity class', $requestedName));
+        }
+        $field = new RepositoryGraphQLField($options ?? [], $container->get(GraphQLTypeManager::class));
         /** @var EntityManager $entityManager */
         $entityManager = $container->get(EntityManager::class);
         $field->setRepository($entityManager->getRepository($requestedName));

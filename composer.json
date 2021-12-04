@@ -28,7 +28,8 @@
   },
   "require-dev": {
     "laminas/laminas-test": "^3.5",
-    "phpmetrics/phpmetrics": "^2.7"
+    "phpmetrics/phpmetrics": "^2.7",
+    "vimeo/psalm": "^4.13"
   },
   "scripts": {
     "test": "phpunit",
@@ -36,6 +37,7 @@
     "metrics": [
       "XDEBUG_MODE=coverage phpunit --log-junit=build/junit.xml",
       "phpmetrics --report-html=build/metrics --junit=build/junit.xml --git src"
-    ]
+    ],
+    "psalm": "psalm"
   }
 }
