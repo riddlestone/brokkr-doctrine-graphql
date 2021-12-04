@@ -70,7 +70,7 @@ class RepositoryGraphQLField extends FieldDefinition implements NeedsTypeManager
         foreach ($node->selectionSet->selections as $child) {
             if (
                 !$child instanceof FieldNode
-                || !$child->selectionSet->selections
+                || !$child->selectionSet
                 || $child->selectionSet->selections->count() == 0
             ) {
                 continue;
