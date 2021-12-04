@@ -45,7 +45,7 @@ class DoctrineEntityType extends ObjectType
             $type = $typeMapper->getGraphQLType($mapping);
             if ($type) {
                 $fields[$fieldName] = [
-                    'type' => fn(): string => $typeManager->get($type),
+                    'type' => fn(): Type => $typeManager->get($type),
                     'resolve' =>
                         /**
                          * @param mixed $entity
