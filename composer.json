@@ -27,9 +27,15 @@
     }
   },
   "require-dev": {
-    "laminas/laminas-test": "^3.5"
+    "laminas/laminas-test": "^3.5",
+    "phpmetrics/phpmetrics": "^2.7"
   },
   "scripts": {
-    "test": "phpunit"
+    "test": "phpunit",
+    "coverage": "XDEBUG_MODE=coverage phpunit --coverage-html=build/coverage",
+    "metrics": [
+      "XDEBUG_MODE=coverage phpunit --log-junit=build/junit.xml",
+      "phpmetrics --report-html=build/metrics --junit=build/junit.xml --git src"
+    ]
   }
 }
