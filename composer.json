@@ -39,5 +39,10 @@
       "phpmetrics --report-html=build/metrics --junit=build/junit.xml --git src"
     ],
     "psalm": "psalm"
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/package-versions-deprecated": true
+    }
   }
 }

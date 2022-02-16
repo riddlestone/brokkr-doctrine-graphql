@@ -5,6 +5,8 @@ namespace Doctrine\ORM\Mapping;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 
 /**
+ * Need this until ClassMetadataInfo declares the fields used in association mappings itself
+ *
  * @psalm-type AssociationMapping = array{
  *   fieldName: string,
  *   targetEntity: string,
