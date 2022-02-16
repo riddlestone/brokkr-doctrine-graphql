@@ -26,13 +26,13 @@ class RepositoryGraphQLField extends FieldDefinition implements NeedsTypeManager
                     ),
                     'resolve' =>
                         /**
-                         * @param mixed $rootValue
-                         * @param mixed $args
-                         * @param mixed $contextValue
+                         * @param mixed $_rootValue
+                         * @param mixed $_args
+                         * @param mixed $_contextValue
                          * @param ResolveInfo $info
                          * @return array
                          */
-                        fn ($rootValue, $args, $contextValue, ResolveInfo $info): array => $this->resolve($info),
+                        fn ($_rootValue, $_args, $_contextValue, ResolveInfo $info): array => $this->resolve($info),
                 ],
                 $config
             )
@@ -66,7 +66,8 @@ class RepositoryGraphQLField extends FieldDefinition implements NeedsTypeManager
     {
         $queryBuilder = $this->getRepository()->createQueryBuilder($this->getTableAlias(0));
         $this->joinRequiredTables($queryBuilder, $info->fieldNodes[0]);
-        return $queryBuilder->getQuery()->getResult();
+        assert(is_array($result = $queryBuilder->getQuery()->getResult()));
+        return $result;
     }
 
     /**

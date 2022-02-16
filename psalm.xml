@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <psalm
-    errorLevel="2"
+    errorLevel="1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
@@ -11,4 +11,9 @@
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
+    <stubs>
+        <file name="stubs/doctrine/orm.php" />
+        <file name="stubs/laminas/laminas-servicemanager.php" />
+        <file name="stubs/riddlestone/brokkr-graphql.php" />
+    </stubs>
 </psalm>

@@ -48,7 +48,7 @@ class DoctrineEntityType extends ObjectType
                     'type' => fn(): Type => $typeManager->get($type),
                     'resolve' =>
                         /**
-                         * @param mixed $entity
+                         * @param object $entity
                          * @return mixed
                          */
                         fn($entity) => $metadata->getFieldValue($entity, $fieldName),
@@ -75,7 +75,7 @@ class DoctrineEntityType extends ObjectType
                 },
                 'resolve' =>
                     /**
-                     * @param mixed $entity
+                     * @param object $entity
                      * @return mixed
                      */
                     fn($entity) => $metadata->getFieldValue($entity, $associationMapping['fieldName']),
