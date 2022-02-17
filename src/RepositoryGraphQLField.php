@@ -66,7 +66,8 @@ class RepositoryGraphQLField extends FieldDefinition implements NeedsTypeManager
     {
         $queryBuilder = $this->getRepository()->createQueryBuilder($this->getTableAlias(0));
         $this->joinRequiredTables($queryBuilder, $info->fieldNodes[0]);
-        assert(is_array($result = $queryBuilder->getQuery()->getResult()));
+        $result = $queryBuilder->getQuery()->getResult();
+        assert(is_array($result));
         return $result;
     }
 

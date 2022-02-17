@@ -28,9 +28,12 @@ class DoctrineEntityTypeFactory implements AbstractFactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): DoctrineEntityType
     {
-        assert(($entityManager = $container->get(EntityManager::class)) instanceof EntityManager);
-        assert(($typeManager = $container->get(GraphQLTypeManager::class)) instanceof GraphQLTypeManager);
-        assert(($typeMapper = $container->get(TypeMapper::class)) instanceof TypeMapper);
+        $entityManager = $container->get(EntityManager::class);
+        assert($entityManager instanceof EntityManager);
+        $typeManager = $container->get(GraphQLTypeManager::class);
+        assert($typeManager instanceof GraphQLTypeManager);
+        $typeMapper = $container->get(TypeMapper::class);
+        assert($typeMapper instanceof TypeMapper);
         return new DoctrineEntityType(
             $requestedName,
             $entityManager,

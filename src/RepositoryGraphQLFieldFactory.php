@@ -45,9 +45,11 @@ class RepositoryGraphQLFieldFactory implements AbstractFactoryInterface
         if (!class_exists($requestedName)) {
             throw new ServiceNotFoundException(sprintf('"%s" is not a known entity class', $requestedName));
         }
-        assert(($typeManager = $container->get(GraphQLTypeManager::class)) instanceof GraphQLTypeManager);
+        $typeManager = $container->get(GraphQLTypeManager::class);
+        assert($typeManager instanceof GraphQLTypeManager);
         $field = new RepositoryGraphQLField($options ?? [], $typeManager);
-        assert(($entityManager = $container->get(EntityManager::class)) instanceof EntityManager);
+        $entityManager = $container->get(EntityManager::class);
+        assert($entityManager instanceof EntityManager);
         $field->setRepository($entityManager->getRepository($requestedName));
         return $field;
     }
