@@ -18,7 +18,7 @@
   "require": {
   "php": "7.4.*",
     "doctrine/doctrine-orm-module": "^4.1",
-    "riddlestone/brokkr-graphql": "^0.2.0",
+    "riddlestone/brokkr-graphql": "^0.2.1",
     "doctrine/dbal": "^2.13"
   },
   "autoload-dev": {
